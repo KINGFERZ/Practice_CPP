@@ -1,0 +1,92 @@
+#include <iostream>
+#include <string>
+#include <list>
+
+using namespace std;
+
+class HashTable {
+private:
+    static const int numOfVal = 10;
+    list<pair<int, string>> table[numOfVal];
+
+public:
+
+    int hashFunction(int key);
+
+    void insertVal(int key, string value);
+
+    void removeVal(int key);
+
+    void printTable();
+};
+
+int HashTable::hashFunction(int key){ // simply hash-function with lots of collisions
+    return key % numOfVal;
+}
+
+void HashTable::insertVal(int key, string value) {
+    int hashVal = hashFunction(key);
+    auto& cell = table[hashVal];
+    auto bItr = begin(cell);
+    bool keysExist = false;
+
+    while(bItr != end(cell)){
+        if(bItr->first == key){
+            keysExist = true;
+            bItr->second = value;
+            cout << "Key exists. Value is replaced" << endl;
+            break;
+        }
+        bItr++;
+    }
+
+    if(keysExist == false) {
+        cell.emplace_back(key, value);
+    }
+}
+
+void HashTable::removeVal(int key) {
+    int hashVal = hashFunction(key);
+    auto &cell = table[hashVal];
+    auto bItr = begin(cell);
+    bool keysExist = false;
+
+    while(bItr != end(cell)){
+        if (bItr->first == key) {
+            keysExist = true;
+            cell.erase(bItr);
+            break;
+        }
+        bItr++;
+    }
+
+    if (keysExist == false) {
+        cout << "Value not found" << endl;
+    }
+}
+
+void HashTable::printTable(){
+    for(int i = 0; i < numOfVal; i++){
+        if(table[i].size() == 0){
+            continue;
+        }
+        auto bItr = table[i].begin();
+        for(; bItr != table[i].end(); bItr++){
+            cout << "Key - " << bItr -> first << " " << "Value - "<< bItr -> second << endl;
+        }
+    }
+}
+
+int main(){
+    HashTable HT;
+
+    HT.insertVal(66, "Sam");
+    HT.insertVal(911, "Jim");
+
+    HT.printTable();
+
+    HT.removeVal(66);
+    HT.removeVal(911);
+
+    return 0;
+}
