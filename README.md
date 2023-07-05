@@ -1,1 +1,1 @@
-# Practice_C++
+# Some basic projects to start learning C++
