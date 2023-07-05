@@ -1,0 +1,106 @@
+/*
+
+    A little description of the project:
+    This program is a "Timsort" sorting algorithm - the most efficient of all (N * logN on average).
+    The basic idea of timsort is that it first splits the array into small pieces (parts),
+    and then sorts each piece using insertion sorting.
+    Then these sorted chunks are combined using merge sorting.
+
+ */
+
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+#define RUN 64
+
+int min(int a, int b){
+    return a < b ? a : b;
+}
+
+void merge(vector<int> &array_to_sort, int left, int mid, int right){
+    int first_len = mid - left + 1;
+    int second_len = right - mid;
+    vector<int> left_part(first_len);
+    vector<int> right_part(second_len);
+
+    for(int i = 0; i < first_len; i++){
+        left_part[i] = array_to_sort[left + i];
+    }
+    for(int i = 0; i < second_len; i++){
+        right_part[i] = array_to_sort[mid + 1 + i];
+    }
+
+    int i = 0, j = 0, k = left;
+
+    while(i < first_len and j < second_len){
+        if(left_part[i] <= right_part[j]){
+            array_to_sort[k] = left_part[i];
+            i++;
+        }
+        else{
+            array_to_sort[k] = right_part[j];
+            j++;
+        }
+        k++;
+    }
+
+    while(i < first_len){
+        array_to_sort[k] = left_part[i];
+        k++;
+        i++;
+    }
+
+    while(j < second_len){
+        array_to_sort[k] = right_part[j];
+        k++;
+        j++;
+    }
+}
+
+void insertion_sort(vector<int> &array_to_sort, int left, int right){
+    for(int i = left + 1; i <= right; i++){
+        int buf = array_to_sort[i];
+        int j = i - 1;
+        while(j >= left and array_to_sort[j] > buf){
+            array_to_sort[j+1] = array_to_sort[j];
+            j--;
+        }
+        array_to_sort[j+1] = buf;
+    }
+}
+
+void timsort(vector <int>& array_to_sort){
+    for(int i = 0; i < array_to_sort.size(); i++){
+        insertion_sort(array_to_sort, i, min(i + RUN - 1, array_to_sort.size() - 1));
+    }
+
+    for(int size = RUN; size < array_to_sort.size(); size = 2 * size){
+        for(int left = 0; left < array_to_sort.size(); left += 2 * size){
+            int mid = left + size - 1;
+            int right = min(left + 2 * size - 1, array_to_sort.size() - 1);
+            merge(array_to_sort, left, mid, right);
+        }
+    }
+}
+
+int main(){
+    int count_of_numbers = 0, current_number = 0;
+    vector <int> array_to_sort;
+
+    cin >> count_of_numbers;
+    for(int i = 0; i < count_of_numbers; i++){
+        cin >> current_number;
+        array_to_sort.push_back(current_number);
+    }
+
+    timsort(array_to_sort);
+
+    for(int i = 0; i < array_to_sort.size(); i++){
+        cout << array_to_sort[i] << " ";
+    }
+
+    return 0;
+}
